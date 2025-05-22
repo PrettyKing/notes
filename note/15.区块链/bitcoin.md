@@ -1,4 +1,146 @@
-# 比特币：一种点对点电子货币系统
+一旦某个货币的最新交易已经被足够多的区块覆盖，这之前的支付交易就可以被丢弃以节省磁盘空间。为便于此而又不破坏区块的哈希值，交易将被哈希进默克尔树 [7][2][5]，只有根节点被纳入到区块的哈希值。老的区块可通过剪除树枝的方式被压缩。树枝内部的哈希不需要被保存。
+
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <text x="400" y="30" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#333">默克尔树与区块压缩示意图</text>
+  <g transform="translate(50, 60)">
+    <text x="150" y="0" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="#333">完整区块</text>
+    <rect x="0" y="10" width="300" height="40" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+    <text x="150" y="25" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">区块头（区块哈希）</text>
+    <text x="40" y="40" font-family="Arial" font-size="10" fill="#666">上一个哈希</text>
+    <text x="150" y="40" font-family="Arial" font-size="10" fill="#666">默克尔根</text>
+    <text x="240" y="40" font-family="Arial" font-size="10" fill="#666">随机数</text>
+    <rect x="120" y="70" width="60" height="25" fill="#ff9800" stroke="#e65100" stroke-width="2" rx="3"/>
+    <text x="150" y="87" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold">根哈希</text>
+    <rect x="60" y="110" width="60" height="25" fill="#ffc107" stroke="#ff8f00" stroke-width="1" rx="3"/>
+    <text x="90" y="127" text-anchor="middle" font-family="Arial" font-size="10">哈希01</text>
+    <rect x="180" y="110" width="60" height="25" fill="#ffc107" stroke="#ff8f00" stroke-width="1" rx="3"/>
+    <text x="210" y="127" text-anchor="middle" font-family="Arial" font-size="10">哈希23</text>
+    <rect x="30" y="150" width="50" height="25" fill="#fff176" stroke="#fbc02d" stroke-width="1" rx="3"/>
+    <text x="55" y="167" text-anchor="middle" font-family="Arial" font-size="10">哈希0</text>
+    <rect x="90" y="150" width="50" height="25" fill="#fff176" stroke="#fbc02d" stroke-width="1" rx="3"/>
+    <text x="115" y="167" text-anchor="middle" font-family="Arial" font-size="10">哈希1</text>
+    <rect x="150" y="150" width="50" height="25" fill="#fff176" stroke="#fbc02d" stroke-width="1" rx="3"/>
+    <text x="175" y="167" text-anchor="middle" font-family="Arial" font-size="10">哈希2</text>
+    <rect x="210" y="150" width="50" height="25" fill="#fff176" stroke="#fbc02d" stroke-width="1" rx="3"/>
+    <text x="235" y="167" text-anchor="middle" font-family="Arial" font-size="10">哈希3</text>
+    <rect x="30" y="190" width="50" height="25" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3"/>
+    <text x="55" y="207" text-anchor="middle" font-family="Arial" font-size="10">交易0</text>
+    <rect x="90" y="190" width="50" height="25" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3"/>
+    <text x="115" y="207" text-anchor="middle" font-family="Arial" font-size="10">交易1</text>
+    <rect x="150" y="190" width="50" height="25" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3"/>
+    <text x="175" y="207" text-anchor="middle" font-family="Arial" font-size="10">交易2</text>
+    <rect x="210" y="190" width="50" height="25" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3"/>
+    <text x="235" y="207" text-anchor="middle" font-family="Arial" font-size="10">交易3</text>
+    <line x1="140" y1="95" x2="100" y2="110" stroke="#666" stroke-width="1"/>
+    <line x1="160" y1="95" x2="200" y2="110" stroke="#666" stroke-width="1"/>
+    <line x1="80" y1="135" x2="65" y2="150" stroke="#666" stroke-width="1"/>
+    <line x1="100" y1="135" x2="125" y2="150" stroke="#666" stroke-width="1"/>
+    <line x1="190" y1="135" x2="175" y2="150" stroke="#666" stroke-width="1"/>
+    <line x1="210" y1="135" x2="225" y2="150" stroke="#666" stroke-width="1"/>
+    <line x1="55" y1="175" x2="55" y2="190" stroke="#666" stroke-width="1"/>
+    <line x1="115" y1="175" x2="115" y2="190" stroke="#666" stroke-width="1"/>
+    <line x1="175" y1="175" x2="175" y2="190" stroke="#666" stroke-width="1"/>为了实现一个基于点对点的时间戳服务器，我们需要使用一个类似 Adam Back 提出的哈希货币 [6] 的工作量证明系统，而不是报纸或新闻组帖子那样。工作量证明采取搜索一个数，使得被哈希时（如使用 SHA-256）得到的哈希值以数个 0 比特开始。平均所需工作量将随所需 0 比特呈指数级增长而验证却只需执行一次哈希。
+
+对于我们的时间戳网络。我们通过在区块中加入一个随机数，直到使得区块的哈希值满足所需 0 比特的数被找到的方式实现工作量证明。一旦消耗了 CPU 算力使区块满足了工作量证明，那么除非重做这个工作否则就无法更改区块。由于后面的区块是链接在这个区块后面的，改变这个区块将需要重做所有后面的区块。
+
+<svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="350" fill="#f8f9fa"/>
+  <text x="400" y="30" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#333">工作量证明示意图</text>
+  <g transform="translate(50, 70)">
+    <rect x="0" y="0" width="160" height="120" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+    <text x="80" y="20" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">区块</text>
+    <rect x="10" y="25" width="60" height="20" fill="#ffcdd2" stroke="#d32f2f" stroke-width="1" rx="2"/>
+    <text x="40" y="38" text-anchor="middle" font-family="Arial" font-size="10">上一个哈希</text>
+    <rect x="90" y="25" width="60" height="20" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="2"/>
+    <text x="120" y="38" text-anchor="middle" font-family="Arial" font-size="10">随机数</text>
+    <rect x="10" y="50" width="40" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="30" y="66" text-anchor="middle" font-family="Arial" font-size="10">交易</text>
+    <rect x="60" y="50" width="40" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="80" y="66" text-anchor="middle" font-family="Arial" font-size="10">交易</text>
+    <rect x="110" y="50" width="40" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="130" y="66" text-anchor="middle" font-family="Arial" font-size="10">...</text>
+    <rect x="10" y="85" width="140" height="25" fill="#ffeb3b" stroke="#f57f17" stroke-width="2" rx="3"/>
+    <text x="80" y="102" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">0000a1b2c3d4...</text>
+  </g>
+  <path d="M 230 130 L 280 130" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <g transform="translate(300, 70)">
+    <rect x="0" y="0" width="160" height="120" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+    <text x="80" y="20" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">区块</text>
+    <rect x="10" y="25" width="60" height="20" fill="#ffcdd2" stroke="#d32f2f" stroke-width="1" rx="2"/>
+    <text x="40" y="38" text-anchor="middle" font-family="Arial" font-size="10">上一个哈希</text>
+    <rect x="90" y="25" width="60" height="20" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="2"/>
+    <text x="120" y="38" text-anchor="middle" font-family="Arial" font-size="10">随机数</text>
+    <rect x="10" y="50" width="40" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="30" y="66" text-anchor="middle" font-family="Arial" font-size="10">交易</text>
+    <rect x="60" y="50" width="40" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="80" y="66" text-anchor="middle" font-family="Arial" font-size="10">交易</text>
+    <rect x="110" y="50" width="40" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="130" y="66" text-anchor="middle" font-family="Arial" font-size="10">...</text>
+    <rect x="10" y="85" width="140" height="25" fill="#ffeb3b" stroke="#f57f17" stroke-width="2" rx="3"/>
+    <text x="80" y="102" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">0000f5e6d7c8...</text>
+  </g>
+  <path d="M 480 130 L 530 130" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <g transform="translate(550, 70)">
+    <rect x="0" y="0" width="160" height="120" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+    <text x="80" y="20" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">区块</text>
+    <rect x="10" y="25" width="60" height="20" fill="#ffcdd2" stroke="#d32f2f" stroke-width="1" rx="2"/>
+    <text x="40" y="38" text-anchor="middle" font-family="Arial" font-size="10">上一个哈希</text>
+    <rect x="90" y="25" width="60" height="20" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="2"/>
+    <text x="120" y="38" text-anchor="middle" font-family="Arial" font-size="10">随机数</text>
+    <rect x="10" y="50" width="40" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="30" y="66" text-anchor="middle" font-family="Arial" font-size="10">交易</text>
+    <rect x="60" y="50" width="40" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="80" y="66" text-anchor="middle" font-family="Arial" font-size="10">交易</text>
+    <rect x="110" y="50" width="40" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="130" y="66" text-anchor="middle" font-family="Arial" font-size="10">...</text>
+    <rect x="10" y="85" width="140" height="25" fill="#ffeb3b" stroke="#f57f17" stroke-width="2" rx="3"/>
+    <text x="80" y="102" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">0000b9a8c7d6...</text>
+  </g>
+  <g transform="translate(130, 220)">
+    <rect x="0" y="0" width="100" height="40" fill="#fff3e0" stroke="#f57c00" stroke-width="2" rx="5"/>
+    <text x="50" y="15" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">CPU工作</text>
+    <text x="50" y="30" text-anchor="middle" font-family="Arial" font-size="10">寻找随机数</text>
+  </g>
+  <g transform="translate(380, 220)">
+    <rect x="0" y="0" width="100" height="40" fill="#fff3e0" stroke="#f57c00" stroke-width="2" rx="5"/>
+    <text x="50" y="15" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">CPU工作</text>
+    <text x="50" y="30" text-anchor="middle" font-family="Arial" font-size="10">寻找随机数</text>
+  </g>
+  <g transform="translate(630, 220)">
+    <rect x="0" y="0" width="100" height="40" fill="#fff3e0" stroke="#f57c00" stroke-width="2" rx="5"/>
+    <text x="50" y="15" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">CPU工作</text>
+    <text x="50" y="30" text-anchor="middle" font-family="Arial" font-size="10">寻找随机数</text>
+  </g>
+  <path d="M 180 220 L 180 200" stroke="#f57c00" stroke-width="2" fill="none" marker-end="url(#arrowhead-orange)"/>
+  <path d="M 430 220 L 430 200" stroke="#f57c00" stroke-width="2" fill="none" marker-end="url(#arrowhead-orange)"/>
+  <path d="M 680 220 L 680 200" stroke="#f57c00" stroke-width="2" fill="none" marker-end="url(#arrowhead-orange)"/>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="arrowhead-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f57c00"/>
+    </marker>
+  </defs>
+  <g transform="translate(50, 280)">
+    <text x="0" y="0" font-family="Arial" font-size="12" fill="#666">
+      • 每个区块必须找到合适的随机数，使区块哈希以多个0开头
+    </text>
+    <text x="0" y="18" font-family="Arial" font-size="12" fill="#666">
+      • 需要大量CPU计算才能找到有效的随机数
+    </text>
+    <text x="0" y="36" font-family="Arial" font-size="12" fill="#666">
+      • 验证工作量证明只需一次哈希计算
+    </text>
+  </g>
+  <g transform="translate(50, 50)">
+    <rect x="0" y="0" width="15" height="15" fill="#ff5722"/>
+    <text x="20" y="12" font-family="Arial" font-size="11" fill="#666">必须以0000开头的哈希</text>
+    <rect x="200" y="0" width="15" height="15" fill="#c8e6c9" stroke="#388e3c"/>
+    <text x="220" y="12" font-family="Arial" font-size="11" fill="#666">随机数（需要不断尝试）</text>
+  </g>
+</svg># 比特币：一种点对点电子货币系统
 
 **Satoshi Nakamoto**  
 satoshin@gmx.com  
@@ -22,7 +164,75 @@ Bill Zhao (billzhao430@live.com)*
 
 我们将一枚电子货币定义为一条数字签名链。每个拥有者都通过将上一次交易和下一个拥有者的公钥的哈希值的数字签名添加到此货币末尾的方式将这枚货币转移给下一个拥有者。收款人可以通过验证数字签名来证实其为该链的所有者。
 
-![交易示意图]
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="400" fill="#f8f9fa"/>
+  <g transform="translate(50, 50)">
+    <rect x="0" y="0" width="180" height="120" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+    <text x="90" y="20" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">交易</text>
+    <rect x="10" y="30" width="160" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="3"/>
+    <text x="90" y="47" text-anchor="middle" font-family="Arial" font-size="12">所有者1的公钥</text>
+    <rect x="10" y="60" width="50" height="20" fill="#ffeb3b" stroke="#f57f17" stroke-width="1" rx="3"/>
+    <text x="35" y="73" text-anchor="middle" font-family="Arial" font-size="10">哈希</text>
+    <rect x="10" y="85" width="160" height="25" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3"/>
+    <text x="90" y="102" text-anchor="middle" font-family="Arial" font-size="12">所有者0的签名</text>
+  </g>
+  <path d="M 250 110 Q 280 110 310 110" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <g transform="translate(320, 50)">
+    <rect x="0" y="0" width="180" height="120" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+    <text x="90" y="20" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">交易</text>
+    <rect x="10" y="30" width="160" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="3"/>
+    <text x="90" y="47" text-anchor="middle" font-family="Arial" font-size="12">所有者2的公钥</text>
+    <rect x="10" y="60" width="50" height="20" fill="#ffeb3b" stroke="#f57f17" stroke-width="1" rx="3"/>
+    <text x="35" y="73" text-anchor="middle" font-family="Arial" font-size="10">哈希</text>
+    <rect x="10" y="85" width="160" height="25" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3"/>
+    <text x="90" y="102" text-anchor="middle" font-family="Arial" font-size="12">所有者1的签名</text>
+  </g>
+  <path d="M 520 110 Q 550 110 580 110" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <g transform="translate(590, 50)">
+    <rect x="0" y="0" width="180" height="120" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+    <text x="90" y="20" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">交易</text>
+    <rect x="10" y="30" width="160" height="25" fill="#ffffff" stroke="#666" stroke-width="1" rx="3"/>
+    <text x="90" y="47" text-anchor="middle" font-family="Arial" font-size="12">所有者3的公钥</text>
+    <rect x="10" y="60" width="50" height="20" fill="#ffeb3b" stroke="#f57f17" stroke-width="1" rx="3"/>
+    <text x="35" y="73" text-anchor="middle" font-family="Arial" font-size="10">哈希</text>
+    <rect x="10" y="85" width="160" height="25" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3"/>
+    <text x="90" y="102" text-anchor="middle" font-family="Arial" font-size="12">所有者2的签名</text>
+  </g>
+  <g transform="translate(50, 220)">
+    <rect x="0" y="0" width="120" height="30" fill="#ffcdd2" stroke="#d32f2f" stroke-width="1" rx="3"/>
+    <text x="60" y="20" text-anchor="middle" font-family="Arial" font-size="12">所有者1的私钥</text>
+  </g>
+  <path d="M 110 220 Q 110 200 140 185" stroke="#d32f2f" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+  <text x="125" y="200" text-anchor="middle" font-family="Arial" font-size="10" fill="#d32f2f">签名</text>
+  <g transform="translate(320, 220)">
+    <rect x="0" y="0" width="120" height="30" fill="#ffcdd2" stroke="#d32f2f" stroke-width="1" rx="3"/>
+    <text x="60" y="20" text-anchor="middle" font-family="Arial" font-size="12">所有者2的私钥</text>
+  </g>
+  <path d="M 380 220 Q 380 200 410 185" stroke="#d32f2f" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+  <text x="395" y="200" text-anchor="middle" font-family="Arial" font-size="10" fill="#d32f2f">签名</text>
+  <g transform="translate(590, 220)">
+    <rect x="0" y="0" width="120" height="30" fill="#ffcdd2" stroke="#d32f2f" stroke-width="1" rx="3"/>
+    <text x="60" y="20" text-anchor="middle" font-family="Arial" font-size="12">所有者3的私钥</text>
+  </g>
+  <path d="M 650 220 Q 650 200 680 185" stroke="#d32f2f" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+  <text x="665" y="200" text-anchor="middle" font-family="Arial" font-size="10" fill="#d32f2f">签名</text>
+  <path d="M 140 270 Q 140 290 140 320" stroke="#4caf50" stroke-width="2" fill="none" marker-end="url(#arrowhead-green)"/>
+  <text x="120" y="290" text-anchor="middle" font-family="Arial" font-size="10" fill="#4caf50">验证</text>
+  <path d="M 410 270 Q 410 290 410 320" stroke="#4caf50" stroke-width="2" fill="none" marker-end="url(#arrowhead-green)"/>
+  <text x="390" y="290" text-anchor="middle" font-family="Arial" font-size="10" fill="#4caf50">验证</text>
+  <text x="400" y="30" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#333">比特币交易链示意图</text>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50"/>
+    </marker>
+  </defs>
+  <text x="50" y="370" font-family="Arial" font-size="12" fill="#666">
+    每个交易包含前一个交易的哈希和下一个所有者的公钥，通过数字签名链接形成交易链
+  </text>
+</svg>
 
 这里的问题是收款人不能证实某个拥有者没有对此货币进行双重支付。通常的做法是引入一个可信任的中央机构或铸币厂来检查每笔交易是否存在双重支付。每笔交易之后，都需要将这枚货币退回铸币厂以换取发行一枚新的货币，只有由铸币厂直接发行的货币才能被确认没有被双重支付。这个方案的问题在于整个货币系统的命运都依赖于运营铸币厂的公司，每笔交易都需要经过它们，就像银行一样。
 
@@ -32,7 +242,70 @@ Bill Zhao (billzhao430@live.com)*
 
 我们提出的方案从时间戳服务器开始。时间戳服务器计算包含多个需要被打时间戳的数据项的区块的哈希值并广泛地发布这个哈希值，就像在报纸或新闻组帖子里 [2-5]。时间戳能证明要得到这个哈希值，显然这些数据当时一定是存在的。每个时间戳的哈希值都纳入了上一个时间戳，形成一条链，后面的时间戳进一步增强前一个时间戳。
 
-![时间戳服务器示意图]
+<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="300" fill="#f8f9fa"/>
+  <text x="400" y="30" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#333">时间戳服务器示意图</text>
+  <g transform="translate(50, 80)">
+    <rect x="0" y="0" width="140" height="80" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+    <text x="70" y="20" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">区块</text>
+    <rect x="10" y="30" width="35" height="20" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="27" y="43" text-anchor="middle" font-family="Arial" font-size="10">项目</text>
+    <rect x="50" y="30" width="35" height="20" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="67" y="43" text-anchor="middle" font-family="Arial" font-size="10">项目</text>
+    <rect x="90" y="30" width="40" height="20" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="110" y="43" text-anchor="middle" font-family="Arial" font-size="10">...</text>
+    <rect x="10" y="55" width="120" height="20" fill="#ffeb3b" stroke="#f57f17" stroke-width="1" rx="3"/>
+    <text x="70" y="68" text-anchor="middle" font-family="Arial" font-size="12">哈希</text>
+  </g>
+  <path d="M 210 120 L 260 120" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <g transform="translate(280, 80)">
+    <rect x="0" y="0" width="140" height="100" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+    <text x="70" y="20" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">区块</text>
+    <rect x="10" y="25" width="120" height="18" fill="#ffcdd2" stroke="#d32f2f" stroke-width="1" rx="2"/>
+    <text x="70" y="37" text-anchor="middle" font-family="Arial" font-size="11">上一个哈希</text>
+    <rect x="10" y="48" width="35" height="18" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="27" y="59" text-anchor="middle" font-family="Arial" font-size="10">项目</text>
+    <rect x="50" y="48" width="35" height="18" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="67" y="59" text-anchor="middle" font-family="Arial" font-size="10">项目</text>
+    <rect x="90" y="48" width="40" height="18" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="110" y="59" text-anchor="middle" font-family="Arial" font-size="10">...</text>
+    <rect x="10" y="71" width="120" height="20" fill="#ffeb3b" stroke="#f57f17" stroke-width="1" rx="3"/>
+    <text x="70" y="84" text-anchor="middle" font-family="Arial" font-size="12">哈希</text>
+  </g>
+  <path d="M 440 130 L 490 130" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <g transform="translate(510, 80)">
+    <rect x="0" y="0" width="140" height="100" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+    <text x="70" y="20" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">区块</text>
+    <rect x="10" y="25" width="120" height="18" fill="#ffcdd2" stroke="#d32f2f" stroke-width="1" rx="2"/>
+    <text x="70" y="37" text-anchor="middle" font-family="Arial" font-size="11">上一个哈希</text>
+    <rect x="10" y="48" width="35" height="18" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="27" y="59" text-anchor="middle" font-family="Arial" font-size="10">项目</text>
+    <rect x="50" y="48" width="35" height="18" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="67" y="59" text-anchor="middle" font-family="Arial" font-size="10">项目</text>
+    <rect x="90" y="48" width="40" height="18" fill="#ffffff" stroke="#666" stroke-width="1" rx="2"/>
+    <text x="110" y="59" text-anchor="middle" font-family="Arial" font-size="10">...</text>
+    <rect x="10" y="71" width="120" height="20" fill="#ffeb3b" stroke="#f57f17" stroke-width="1" rx="3"/>
+    <text x="70" y="84" text-anchor="middle" font-family="Arial" font-size="12">哈希</text>
+  </g>
+  <path d="M 670 130 L 720 130" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="730" y="135" font-family="Arial" font-size="14" fill="#666">...</text>
+  <path d="M 120 190 Q 120 210 350 210 Q 350 200 350 155" stroke="#ff5722" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+  <path d="M 350 190 Q 350 210 580 210 Q 580 200 580 155" stroke="#ff5722" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+  <text x="50" y="250" font-family="Arial" font-size="12" fill="#666">
+    每个区块都包含上一个区块的哈希值，形成一条时间戳链
+  </text>
+  <g transform="translate(50, 50)">
+    <rect x="0" y="0" width="15" height="15" fill="#ffcdd2" stroke="#d32f2f" stroke-width="1"/>
+    <text x="20" y="12" font-family="Arial" font-size="11" fill="#666">上一个哈希值</text>
+    <rect x="120" y="0" width="15" height="15" fill="#ffeb3b" stroke="#f57f17" stroke-width="1"/>
+    <text x="140" y="12" font-family="Arial" font-size="11" fill="#666">当前区块哈希</text>
+  </g>
+</svg>
 
 ## 4. 工作量证明
 
@@ -40,7 +313,7 @@ Bill Zhao (billzhao430@live.com)*
 
 对于我们的时间戳网络。我们通过在区块中加入一个随机数，直到使得区块的哈希值满足所需 0 比特的数被找到的方式实现工作量证明。一旦消耗了 CPU 算力使区块满足了工作量证明，那么除非重做这个工作否则就无法更改区块。由于后面的区块是链接在这个区块后面的，改变这个区块将需要重做所有后面的区块。
 
-![工作量证明示意图]
+> **查看图表：** [工作量证明示意图](#proof_of_work_diagram)
 
 工作量证明同时解决了在多数决定中确定投票方式的问题。如果多数是按 IP 地址投票来决定，那么它将可能被能分配大量 IP 地址的人破坏。工作量证明本质上是按 CPU 投票。最长的链代表了多数决定，因为有最大的计算工作量证明的算力投入到这条链上。如果多数的 CPU 算力被诚实节点控制，诚实的链就会增长得最快并超过其他的竞争链。要修改过去的某区块，攻击者必须重做这个区块以及其后的所有区块的工作量证明，从而赶上并超过诚实节点的工作。我们后面会证明随着后续的区块被添加一个更慢的攻击者赶上诚实节点的概率将呈指数级递减。
 
@@ -73,7 +346,7 @@ Bill Zhao (billzhao430@live.com)*
 
 一旦某个货币的最新交易已经被足够多的区块覆盖，这之前的支付交易就可以被丢弃以节省磁盘空间。为便于此而又不破坏区块的哈希值，交易将被哈希进默克尔树 [7][2][5]，只有根节点被纳入到区块的哈希值。老的区块可通过剪除树枝的方式被压缩。树枝内部的哈希不需要被保存。
 
-![默克尔树示意图]
+> **查看图表：** [默克尔树示意图](#merkle_tree_diagram)
 
 每个不包含交易的区块头大约是 80 bytes。如果每 10 分钟生成一个区块，每年生成 80 bytes * 6 * 24 * 365 = 4.2 MB，2008 年在售的典型计算机有 2 GB 内存，并且摩尔定律预测目前每年内存增加 1.2 GB，所以就算区块头一定要存在内存里，存储也不是问题。
 
@@ -97,7 +370,7 @@ Bill Zhao (billzhao430@live.com)*
 
 传统的银行模型通过限制参与方和可信任第三方对信息的访问来达到一定级别的隐私保护。交易必须要公开发布就不能使用这个方法，但隐私仍可在其他地方通过阻断信息流的方式来保护：那就是保持公钥匿名。公众能看到有人正在发送一定量货币给其他人，但是不能将交易关联到某个人。这和证券交易所发布的信息级别类似，每笔交易的时间和交易量，即行情是公开的，但是不会显示交易双方是谁。
 
-![隐私模型对比图]
+> **查看图表：** [隐私模型对比图](#privacy_model_diagram)
 
 作为额外的防火墙，对每笔交易使用新密钥对可以防止他们被关联到一个共同的拥有者。由于多输入值交易存在，有些关联仍不可避免，因为多输入值交易必然暴露其多个输入是属于同一个拥有者的。风险就在于如果一个密钥的拥有者被暴露，关联性将暴露属于同一个拥有者的其他交易。
 
