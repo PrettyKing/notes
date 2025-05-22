@@ -7,5 +7,3 @@
 ### 个人博客：
 
 - [prettyking.github.io/my-website/](https://prettyking.github.io/my-website/)
-- http://wei-chens-blog.gitee.io/vuepress-reco-blog/
-
