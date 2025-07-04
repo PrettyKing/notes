@@ -1,0 +1,79 @@
+{
+  "compilerOptions": {
+    /* 基本选项 */
+    "target": "ES2020",                          // 编译目标版本
+    "module": "ESNext",                          // 模块系统
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],    // 包含的库文件
+    "allowJs": true,                             // 允许编译 JavaScript 文件
+    "checkJs": false,                            // 检查 JavaScript 文件中的错误
+    "jsx": "react-jsx",                          // JSX 编译方式（如果使用 React）
+    "declaration": true,                         // 生成 .d.ts 文件
+    "declarationMap": true,                      // 生成 .d.ts.map 文件
+    "sourceMap": true,                           // 生成 source map 文件
+    "outDir": "./dist",                          // 输出目录
+    "rootDir": ".",                              // 根目录
+    "removeComments": true,                      // 移除注释
+    "noEmit": false,                             // 不生成输出文件
+    "incremental": true,                         // 启用增量编译
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",    // 增量编译信息文件
+
+    /* 严格类型检查选项 */
+    "strict": true,                              // 启用所有严格类型检查选项
+    "noImplicitAny": true,                       // 不允许隐式 any 类型
+    "strictNullChecks": true,                    // 严格空值检查
+    "strictFunctionTypes": true,                 // 严格函数类型检查
+    "strictBindCallApply": true,                 // 严格 bind/call/apply 检查
+    "strictPropertyInitialization": true,       // 严格属性初始化检查
+    "noImplicitThis": true,                      // 不允许隐式 this
+    "alwaysStrict": true,                        // 总是以严格模式解析
+    "noImplicitReturns": true,                   // 不允许函数存在隐式返回
+    "noFallthroughCasesInSwitch": true,         // 不允许 switch 语句贯穿
+    "noUncheckedIndexedAccess": true,           // 对索引访问进行未检查的类型检查
+
+    /* 模块解析选项 */
+    "moduleResolution": "node",                  // 模块解析策略
+    "baseUrl": "./",                             // 基础目录
+    // "paths": {                                   // 路径映射
+    //   "@/*": ["src/*"],
+    //   "@/components/*": ["src/components/*"],
+    //   "@/utils/*": ["src/utils/*"],
+    //   "@/types/*": ["src/types/*"]
+    // },
+    "esModuleInterop": true,                     // 启用 ES 模块互操作
+    "allowSyntheticDefaultImports": true,       // 允许合成默认导入
+    "resolveJsonModule": true,                   // 解析 JSON 模块
+    "isolatedModules": true,                     // 独立模块
+
+    /* 实验性选项 */
+    "experimentalDecorators": true,              // 启用实验性装饰器
+    "emitDecoratorMetadata": true,              // 为装饰器生成元数据
+
+    /* 高级选项 */
+    "skipLibCheck": true,                        // 跳过库文件类型检查
+    "forceConsistentCasingInFileNames": true,   // 强制文件名大小写一致
+    "useDefineForClassFields": true,            // 使用 define 语义定义类字段
+    "allowImportingTsExtensions": false,        // 不允许导入 .ts 扩展名
+    "noEmitOnError": true,                      // 有错误时不生成输出
+    "preserveConstEnums": true,                 // 保留 const 枚举
+    "pretty": true,                             // 美化输出
+    "listEmittedFiles": false,                  // 列出生成的文件
+    "listFiles": false                          // 列出编译的文件
+  },
+//   "include": [
+//     "src/**/*",                                 // 包含 src 目录下所有文件
+//     "types/**/*"                                // 包含 types 目录下所有文件
+//   ],
+  "exclude": [
+    "node_modules",                             // 排除 node_modules
+    "dist",                                     // 排除输出目录
+    "build",                                    // 排除构建目录
+    "**/*.test.ts",                            // 排除测试文件
+    "**/*.spec.ts",                            // 排除规范文件
+    "coverage",                                // 排除覆盖率目录
+    "**/*.d.ts"                                // 排除声明文件
+  ],
+  "ts-node": {
+    "esm": true,                               // 启用 ESM 支持
+    "experimentalSpecifierResolution": "node"   // 实验性说明符解析
+  }
+}
