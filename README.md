@@ -7,3 +7,4 @@
 ### 个人博客：
 
 - [prettyking.github.io/my-website/](https://prettyking.github.io/my-website/)
+- 长风破浪会有时，直挂云帆济沧海
