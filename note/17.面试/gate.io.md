@@ -6,3 +6,4 @@
 4. react fiber
 5. 强缓存和协商缓存
 6. IOC与SOLID
+7. nextjs框架A页面切到B页面会卡，为什么
