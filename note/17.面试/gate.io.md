@@ -1,7 +1,6 @@
 # 问题总结
-
-1. 工程化是什么,项目中做了哪些工程化的功能
-``` shell
+---
+#  工程化是什么,项目中做了哪些工程化的功能
 工程化是指将软件开发过程中的各种实践、工具和流程系统化、自动化的过程，目标是提高开发效率、代码质量和项目的可维护性。
 
 ## 工程化的核心概念
@@ -45,9 +44,9 @@
 - **项目文档**：README、贡献指南、部署文档
 
 这些工程化实践帮助团队建立高效、可靠的开发流程，减少人为错误，提高代码质量，使项目更容易维护和扩展。不同项目会根据具体需求选择合适的工程化工具和实践。
-```
-2. 性能优化
-``` shell
+
+# 性能优化
+
 ## 性能优化总结
 
 ### 前端性能优化策略
@@ -75,8 +74,8 @@
 **用户体验优化**：添加骨架屏和加载状态；实现图片懒加载和占位符；优化首屏加载时间。
 
 具体的优化效果需要通过 Lighthouse、Performance 工具进行测量和验证，确保优化措施真正提升了用户体验。
-```
-3. 输出结果预测
+
+# 输出结果预测
 ``` js
 console.log('start');
 
@@ -116,8 +115,51 @@ Promise.resolve().then(() => {
 
 console.log('end');
 ```
-4. react fiber
-``` shell
+让我分析这段JavaScript代码的执行顺序和输出。让我重新分析这段代码，通过理解JavaScript的事件循环机制来确定输出顺序：这段代码的输出顺序是：
+
+```shell
+start
+async1 start
+async2
+promise resolve or reject
+end
+async1 end
+promise 1
+promise 2
+timeout 1
+promise in timeout1
+timeout 2
+timeout in promise
+```
+
+**执行顺序解析：**
+
+1. **同步代码阶段：**
+   - `console.log('start')` - 直接执行
+   - `async1()` 调用，执行到 `await` 前的部分
+   - `console.log('async1 start')` - 直接执行
+   - `async2()` 同步执行，输出 `async2`
+   - `await` 暂停，`async1` 剩余部分进入微任务队列
+   - 两个 `setTimeout` 进入宏任务队列
+   - `new Promise` 构造函数同步执行，输出 `promise resolve or reject`
+   - 两个 `Promise.resolve().then()` 进入微任务队列
+   - `console.log('end')` - 直接执行
+2. **微任务队列执行：**
+   - `async1` 中 `await` 后的代码：输出 `async1 end`
+   - 第一个 Promise.then：输出 `promise 1`，并添加新的 setTimeout 到宏任务队列
+   - 第二个 Promise.then：输出 `promise 2`
+3. **宏任务队列执行：**
+   - 第一个 setTimeout：输出 `timeout 1`，然后其内部的 Promise 进入微任务队列
+   - 微任务：输出 `promise in timeout1`
+   - 第二个 setTimeout：输出 `timeout 2`
+   - Promise 中创建的 setTimeout：输出 `timeout in promise`
+
+这个例子很好地展示了JavaScript事件循环中同步代码、微任务（Promise、async/await）和宏任务（setTimeout）的执行优先级。
+
+
+
+# react fiber
+
 React Fiber 是 React 16 引入的新协调引擎，用于解决大型应用中的性能问题和用户体验问题。
 
 ## 核心概念
@@ -144,9 +186,9 @@ Fiber 采用双缓冲技术，维护 current 树（当前显示）和 workInProg
 - **大型应用性能**：更好地处理复杂组件树的更新
 
 Fiber 让 React 从同步、递归的渲染模式转变为异步、可中断的渲染模式，是 React 性能优化的重要里程碑。
-```
-5. 强缓存和协商缓存
-``` shell
+
+# 强缓存和协商缓存
+
 强缓存和协商缓存是浏览器缓存机制的两种策略，用于优化网页加载性能。
 
 ## 强缓存
@@ -183,9 +225,9 @@ Fiber 让 React 从同步、递归的渲染模式转变为异步、可中断的�
 **协商缓存**：适用于可能更新的资源（HTML、API 数据），在保证时效性的同时利用缓存优势
 
 合理配置两种缓存策略可以显著提升网站性能和用户体验。
-```
-6. IOC与SOLID
-``` shell
+
+# IOC与SOLID
+
 ## IOC（控制反转 Inversion of Control）
 
 **核心概念**：将对象的创建和依赖关系的管理从对象内部转移到外部容器，实现"不要找我，我来找你"的设计模式。
@@ -212,8 +254,7 @@ Fiber 让 React 从同步、递归的渲染模式转变为异步、可中断的�
 ## 关系与应用
 
 IOC 是实现 SOLID 原则的重要手段，特别是依赖倒置原则。通过 IOC 容器管理依赖关系，可以更好地遵循这些设计原则，构建松耦合、高内聚、易维护的软件系统。在现代框架如 Spring、Angular 中都广泛应用这些概念。
-```
-7. nextjs框架A页面切到B页面会卡，为什么
-``` shell
+
+# nextjs框架A页面切到B页面会卡，为什么
+
 Next.js App Router 页面切换卡顿主要是因为服务端组件需要等待渲染、代码分割导致的 JavaScript bundle 下载以及页面数据预取造成的延迟。解决方案包括：添加 loading.tsx 提供加载状态、使用 Link 组件的 prefetch 预加载页面资源、通过 Suspense 实现流式渲染避免阻塞、将非关键部分改为客户端组件、使用 dynamic 懒加载重型组件，以及在导航时使用 startTransition 优化用户体验。
-```
